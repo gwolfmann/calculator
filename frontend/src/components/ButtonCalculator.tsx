@@ -71,35 +71,54 @@ export const ButtonCalculator: React.FC = () => {
   }, []);
 
   const inputNumber = useCallback((num: string) => {
-    if (waitingForNewValue || justCalculated) {
+    if (justCalculated) {
+      // After calculation, start completely fresh
       setDisplay(num);
       setCurrentValue(num);
+      setPreviousValue("");
+      setOperation(null);
       setWaitingForNewValue(false);
       setLastEquation("");
       setJustCalculated(false);
+    } else if (waitingForNewValue) {
+      // After pressing an operation, just replace the display for second operand
+      setDisplay(num);
+      setCurrentValue(num);
+      setWaitingForNewValue(false);
     } else {
+      // Normal number input - append to current display
       const newDisplay = display === "0" ? num : display + num;
       setDisplay(newDisplay);
       setCurrentValue(newDisplay);
     }
-    setError("");
   }, [display, waitingForNewValue, justCalculated]);
 
   const inputDecimal = useCallback(() => {
-    if (waitingForNewValue || justCalculated) {
+    if (justCalculated) {
+      // After calculation, start completely fresh with decimal
       setDisplay("0.");
       setCurrentValue("0.");
+      setPreviousValue("");
+      setOperation(null);
       setWaitingForNewValue(false);
       setLastEquation("");
       setJustCalculated(false);
+    } else if (waitingForNewValue) {
+      // After pressing an operation, start fresh decimal for second operand
+      setDisplay("0.");
+      setCurrentValue("0.");
+      setWaitingForNewValue(false);
     } else if (!display.includes(".")) {
+      // Normal decimal input - append to current display
       setDisplay(display + ".");
       setCurrentValue(display + ".");
     }
   }, [display, waitingForNewValue, justCalculated]);
 
   const performOperation = useCallback(async (nextOperation: BinaryOperation | UnaryOperation) => {
-    const inputValue = parseFloat(currentValue || display);
+    // Use display as the primary source since it's always up-to-date
+    // currentValue might be stale due to React state batching
+    const inputValue = parseFloat(display);
     setError("");
 
     // If we just calculated and a BINARY operation is pressed, use result as first input
@@ -210,7 +229,7 @@ export const ButtonCalculator: React.FC = () => {
       setWaitingForNewValue(true);
       setJustCalculated(false);
     }
-  }, [currentValue, display, operation, waitingForNewValue, previousValue, justCalculated]);
+  }, [currentValue, display, operation, waitingForNewValue, justCalculated]);
 
   const calculate = useCallback(async () => {
     if (!operation || !previousValue || !currentValue) return;
@@ -359,6 +378,12 @@ export const ButtonCalculator: React.FC = () => {
 
   return (
     <div className="calculator-container">
+      {showHistory && (
+        <div
+          className="history-backdrop"
+          onClick={() => setShowHistory(false)}
+        />
+      )}
       <div className="button-calculator">
         <div className="operation-display">
           <div className="operation-text">

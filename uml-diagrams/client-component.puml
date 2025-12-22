@@ -1,0 +1,81 @@
+@startuml CalculatorFrontendComponentDiagram
+
+skinparam componentStyle rectangle
+
+package "Browser" {
+  [DOM (#root)] as Dom
+  [Fetch API] as Fetch
+}
+
+package "React App (frontend/src)" {
+
+  package "Entry" {
+    [index.tsx] as Index
+  }
+
+  package "Composition" {
+    [App.tsx] as App
+  }
+
+  package "UI Components" {
+    [ButtonCalculator.tsx] as ButtonCalculator
+    [History.tsx] as History
+    [ErrorDisplay.tsx] as ErrorDisplay
+  }
+
+  package "Service Layer" {
+    [calculatorApi.ts\n(CalculatorApiService)] as ApiService
+  }
+
+  package "Shared Types" {
+    [types/calculator.ts] as Types
+  }
+
+  package "Shared Utils" {
+    [utils/validation.ts] as Validation
+  }
+
+  package "Styles" {
+    [App.css] as AppCss
+    [index.css] as IndexCss
+    [ButtonCalculator.css] as ButtonCalcCss
+    [History.css] as HistoryCss
+  }
+}
+
+package "Go Backend" {
+  [Go Calculator API\nhttp://localhost:8080] as GoApi
+}
+
+' Bootstrapping
+Dom --> Index : mount React root
+Index --> App : renders
+
+' Composition
+App --> ButtonCalculator : renders
+App --> History : renders
+App --> Types : uses HistoryItem
+
+' UI internal dependencies
+ButtonCalculator --> ApiService : calls operations
+ButtonCalculator --> Types : uses BinaryOperation/\nUnaryOperation/HistoryItem
+ButtonCalculator --> History : renders panel
+ButtonCalculator --> ErrorDisplay : renders errors (if used)
+
+History --> Types : uses HistoryItem
+History --> Validation : formatNumber()
+
+ErrorDisplay --> AppCss : styled by
+
+' Service dependencies
+ApiService --> Fetch : HTTP requests
+ApiService --> Types : request/response DTOs\nand operation enums
+ApiService --> GoApi : /api/v1/*
+
+' Styles usage (high-level)
+App --> AppCss
+Index --> IndexCss
+ButtonCalculator --> ButtonCalcCss
+History --> HistoryCss
+
+@endumlß

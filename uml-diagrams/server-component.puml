@@ -1,0 +1,56 @@
+@startuml CalculatorServerComponentDiagram
+
+package "Main Package" {
+    [main.go] as Main
+}
+
+package "HTTP Layer" {
+    [Gin Router] as Router
+    [CORS Middleware] as CORS
+    [Route Handlers] as Handlers
+}
+
+package "Internal Package" {
+    package "Calculator Service" {
+        [Calculator Service] as Service
+        [Operation Handlers] as Operations
+        [Validation Logic] as Validation
+    }
+}
+
+package "Infrastructure" {
+    [File Logger] as Logger
+    [HTTP Server] as Server
+}
+
+' External dependencies
+package "External Dependencies" {
+    [Gin Framework] as Gin
+    [Gin CORS] as GinCORS
+    [Slog Logger] as Slog
+}
+
+' Relationships
+Main --> Router : creates
+Main --> Logger : configures
+Main --> Service : injects logger
+Main --> CORS : configures
+Main --> Server : starts
+
+Router --> CORS : uses
+Router --> Handlers : manages
+Handlers --> Service : delegates
+
+Service --> Logger : logs operations
+Service --> Validation : validates input
+Service --> Operations : contains
+
+Server --> Router : serves
+Logger --> Slog : uses
+
+' Dependencies
+Router --> Gin : built on
+CORS --> GinCORS : uses
+Logger --> Slog : uses
+
+@enduml

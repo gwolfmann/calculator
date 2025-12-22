@@ -1,6 +1,9 @@
 # Calculator Service
 
-A simple HTTP calculator service built with Go and Gin framework.
+A simple calculator built as:
+
+- A Go + Gin HTTP API (server)
+- A React + TypeScript UI (frontend)
 
 ## Features
 
@@ -75,24 +78,60 @@ All operations also support GET requests with query parameters:
 
 ## Getting Started
 
+## Project Structure
+
+```
+.
+├── main.go                  # Go server entrypoint
+├── internal/                # Go server implementation
+├── frontend/                # React + TypeScript app
+├── server-component.puml    # PlantUML component diagram (server)
+└── client-component.puml    # PlantUML component diagram (frontend)
+```
+
 ### Prerequisites
 - Go 1.24 or higher
+- Node.js 18+ (recommended) and npm
 
 ### Installation
 
 1. Clone the repository
-2. Install dependencies:
+2. Install server dependencies:
    ```bash
    go mod tidy
    ```
 
+3. Install frontend dependencies:
+   ```bash
+   cd frontend
+   npm install
+   ```
+
 ### Running the Application
+
+#### 1) Start the Go server
 
 ```bash
 go run main.go
 ```
 
 The server will start on `http://localhost:8080`
+
+#### 2) Start the React frontend
+
+In a second terminal:
+
+```bash
+cd frontend
+npm start
+```
+
+The frontend will start on `http://localhost:3000`
+
+### Frontend  Server Connection
+
+- The frontend calls the API at `http://localhost:8080/api/v1`.
+- The Go server enables CORS for `http://localhost:3000`.
 
 ## Example Requests
 
