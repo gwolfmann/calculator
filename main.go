@@ -18,7 +18,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to open log file: %v", err)
 	}
-	defer logFile.Close()
+	defer func() {
+		_ = logFile.Close()
+	}()
 
 	// Create a file-based logger
 	fileLogger := slog.New(slog.NewJSONHandler(logFile, &slog.HandlerOptions{

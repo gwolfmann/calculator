@@ -37,7 +37,11 @@ test-coverage:
 
 # Run linter
 lint:
-	$(shell go env GOPATH)/bin/golangci-lint run
+	@if command -v golangci-lint >/dev/null 2>&1; then \
+		golangci-lint run; \
+	else \
+		$(shell go env GOPATH)/bin/golangci-lint run; \
+	fi
 
 # Install linter if not present
 install-lint:
