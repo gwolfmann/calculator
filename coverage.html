@@ -55,7 +55,7 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">calculator/internal/calculator/service.go (95.3%)</option>
+				<option value="file0">calculator/internal/calculator/service.go (95.2%)</option>
 				
 				<option value="file1">calculator/main.go (0.0%)</option>
 				
@@ -75,6 +75,8 @@
 
 import (
         "errors"
+        "io"
+        "log/slog"
         "math"
         "net/http"
         "strconv"
@@ -99,7 +101,17 @@ type Response struct {
 }
 
 // Service handles calculator operations
-type Service struct{}
+type Service struct {
+        Logger *slog.Logger
+}
+
+// logger returns a safe logger (never nil). If Logger is nil, returns a no-op logger.
+func (s *Service) logger() *slog.Logger <span class="cov8" title="1">{
+        if s.Logger != nil </span><span class="cov0" title="0">{
+                return s.Logger
+        }</span>
+        <span class="cov8" title="1">return slog.New(slog.NewTextHandler(io.Discard, nil))</span>
+}
 
 // OperationFunc defines the signature for calculator operations
 type OperationFunc func(a, b float64) (float64, error)
@@ -211,17 +223,22 @@ func (s *Service) NegativeGET(c *gin.Context) <span class="cov8" title="1">{
 func (s *Service) handleOperation(c *gin.Context, op OperationFunc) <span class="cov8" title="1">{
         var req Request
         if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                s.logger().Error("Failed to bind JSON request", "error", err)
                 c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
                 return
         }</span>
 
-        <span class="cov8" title="1">result, err := op(req.A, req.B)
+        <span class="cov8" title="1">s.logger().Info("Processing binary operation request", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", req.A, "b", req.B)
+
+        result, err := op(req.A, req.B)
         if err != nil </span><span class="cov8" title="1">{
+                s.logger().Error("Binary operation failed", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", req.A, "b", req.B, "error", err)
                 c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
                 return
         }</span>
 
-        <span class="cov8" title="1">c.JSON(http.StatusOK, Response{Result: result})</span>
+        <span class="cov8" title="1">s.logger().Info("Binary operation successful", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", req.A, "b", req.B, "result", result)
+        c.JSON(http.StatusOK, Response{Result: result})</span>
 }
 
 // handleGetOperation handles the common logic for all operations via GET
@@ -229,122 +246,180 @@ func (s *Service) handleGetOperation(c *gin.Context, op OperationFunc) <span cla
         aStr := c.Query("a")
         bStr := c.Query("b")
 
+        s.logger().Info("Processing binary operation GET request", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", aStr, "b", bStr)
+
         a, err := strconv.ParseFloat(aStr, 64)
         if err != nil </span><span class="cov8" title="1">{
+                s.logger().Error("Failed to parse parameter 'a'", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", aStr, "error", err)
                 c.JSON(http.StatusBadRequest, gin.H{"error": "invalid value for parameter 'a'"})
                 return
         }</span>
 
         <span class="cov8" title="1">b, err := strconv.ParseFloat(bStr, 64)
         if err != nil </span><span class="cov8" title="1">{
+                s.logger().Error("Failed to parse parameter 'b'", "operation", c.Request.URL.Path, "method", c.Request.Method, "b", bStr, "error", err)
                 c.JSON(http.StatusBadRequest, gin.H{"error": "invalid value for parameter 'b'"})
                 return
         }</span>
 
-        <span class="cov8" title="1">result, err := op(a, b)
+        <span class="cov8" title="1">s.logger().Debug("Parsed binary operation GET parameters", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", a, "b", b)
+
+        result, err := op(a, b)
         if err != nil </span><span class="cov8" title="1">{
+                s.logger().Error("Binary operation GET failed", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", a, "b", b, "error", err)
                 c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
                 return
         }</span>
 
-        <span class="cov8" title="1">c.JSON(http.StatusOK, Response{Result: result})</span>
+        <span class="cov8" title="1">s.logger().Info("Binary operation GET successful", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", a, "b", b, "result", result)
+        c.JSON(http.StatusOK, Response{Result: result})</span>
 }
 
 // handleUnaryOperation handles the common logic for unary operations via POST
 func (s *Service) handleUnaryOperation(c *gin.Context, op UnaryOperationFunc) <span class="cov8" title="1">{
         var req UnaryRequest
         if err := c.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+                s.logger().Error("Failed to bind unary JSON request", "operation", c.Request.URL.Path, "method", c.Request.Method, "error", err)
                 c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
                 return
         }</span>
 
-        <span class="cov8" title="1">result, err := op(req.A)
+        <span class="cov8" title="1">s.logger().Info("Processing unary operation request", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", req.A)
+
+        result, err := op(req.A)
         if err != nil </span><span class="cov8" title="1">{
+                s.logger().Error("Unary operation failed", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", req.A, "error", err)
                 c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
                 return
         }</span>
 
-        <span class="cov8" title="1">c.JSON(http.StatusOK, Response{Result: result})</span>
+        <span class="cov8" title="1">s.logger().Info("Unary operation successful", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", req.A, "result", result)
+        c.JSON(http.StatusOK, Response{Result: result})</span>
 }
 
 // handleGetUnaryOperation handles the common logic for unary operations via GET
 func (s *Service) handleGetUnaryOperation(c *gin.Context, op UnaryOperationFunc) <span class="cov8" title="1">{
         aStr := c.Query("a")
 
+        s.logger().Info("Processing unary operation GET request", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", aStr)
+
         a, err := strconv.ParseFloat(aStr, 64)
         if err != nil </span><span class="cov8" title="1">{
+                s.logger().Error("Failed to parse unary parameter 'a'", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", aStr, "error", err)
                 c.JSON(http.StatusBadRequest, gin.H{"error": "invalid value for parameter 'a'"})
                 return
         }</span>
 
-        <span class="cov8" title="1">result, err := op(a)
+        <span class="cov8" title="1">s.logger().Debug("Parsed unary operation GET parameter", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", a)
+
+        result, err := op(a)
         if err != nil </span><span class="cov8" title="1">{
+                s.logger().Error("Unary operation GET failed", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", a, "error", err)
                 c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
                 return
         }</span>
 
-        <span class="cov8" title="1">c.JSON(http.StatusOK, Response{Result: result})</span>
+        <span class="cov8" title="1">s.logger().Info("Unary operation GET successful", "operation", c.Request.URL.Path, "method", c.Request.Method, "a", a, "result", result)
+        c.JSON(http.StatusOK, Response{Result: result})</span>
 }
 
 // Core operation implementations
 func (s *Service) add(a, b float64) (float64, error) <span class="cov8" title="1">{
-        return a + b, nil
+        s.logger().Debug("Performing addition", "a", a, "b", b)
+        result := a + b
+        s.logger().Debug("Addition result", "result", result)
+        return result, nil
 }</span>
 
 func (s *Service) subtract(a, b float64) (float64, error) <span class="cov8" title="1">{
-        return a - b, nil
+        s.logger().Debug("Performing subtraction", "a", a, "b", b)
+        result := a - b
+        s.logger().Debug("Subtraction result", "result", result)
+        return result, nil
 }</span>
 
 func (s *Service) multiply(a, b float64) (float64, error) <span class="cov8" title="1">{
-        return a * b, nil
+        s.logger().Debug("Performing multiplication", "a", a, "b", b)
+        result := a * b
+        s.logger().Debug("Multiplication result", "result", result)
+        return result, nil
 }</span>
 
 func (s *Service) divide(a, b float64) (float64, error) <span class="cov8" title="1">{
+        s.logger().Debug("Performing division", "a", a, "b", b)
         if b == 0 </span><span class="cov8" title="1">{
+                s.logger().Error("Division by zero attempted", "a", a, "b", b)
                 return 0, errors.New("cannot divide by zero")
         }</span>
-        <span class="cov8" title="1">return a / b, nil</span>
+        <span class="cov8" title="1">result := a / b
+        s.logger().Debug("Division result", "result", result)
+        return result, nil</span>
 }
 
 func (s *Service) percentage(a, b float64) (float64, error) <span class="cov8" title="1">{
-        return a * (b / 100), nil
+        s.logger().Debug("Performing percentage", "a", a, "b", b)
+        result := a * (b / 100)
+        s.logger().Debug("Percentage result", "result", result)
+        return result, nil
 }</span>
 
 func (s *Service) power(a, b float64) (float64, error) <span class="cov8" title="1">{
-        return math.Pow(a, b), nil
+        s.logger().Debug("Performing power operation", "a", a, "b", b)
+        result := math.Pow(a, b)
+        s.logger().Debug("Power result", "result", result)
+        return result, nil
 }</span>
 
 func (s *Service) sqrt(a, b float64) (float64, error) <span class="cov8" title="1">{
+        s.logger().Debug("Performing square root", "a", a)
         if a &lt; 0 </span><span class="cov8" title="1">{
+                s.logger().Error("Square root of negative number attempted", "a", a)
                 return 0, errors.New("cannot calculate square root of negative number")
         }</span>
-        <span class="cov8" title="1">return math.Sqrt(a), nil</span>
+        <span class="cov8" title="1">result := math.Sqrt(a)
+        s.logger().Debug("Square root result", "result", result)
+        return result, nil</span>
 }
 
 func (s *Service) root(a, b float64) (float64, error) <span class="cov8" title="1">{
+        s.logger().Debug("Performing nth root", "a", a, "b", b)
         if b == 0 </span><span class="cov8" title="1">{
+                s.logger().Error("Zeroth root attempted", "a", a, "b", b)
                 return 0, errors.New("cannot calculate 0th root")
         }</span>
         <span class="cov8" title="1">if a &lt; 0 </span><span class="cov8" title="1">{
                 // Check if the root is odd (can handle negative numbers)
                 if math.Mod(b, 2) == 1 </span><span class="cov8" title="1">{
                         // Odd root of negative number
-                        return -math.Pow(-a, 1/b), nil
+                        s.logger().Debug("Performing odd root of negative number", "a", a, "b", b)
+                        result := -math.Pow(-a, 1/b)
+                        s.logger().Debug("Odd root of negative result", "result", result)
+                        return result, nil
                 }</span>
-                <span class="cov8" title="1">return 0, errors.New("cannot calculate even root of negative number")</span>
+                <span class="cov8" title="1">s.logger().Error("Even root of negative number attempted", "a", a, "b", b)
+                return 0, errors.New("cannot calculate even root of negative number")</span>
         }
-        <span class="cov8" title="1">return math.Pow(a, 1/b), nil</span>
+        <span class="cov8" title="1">result := math.Pow(a, 1/b)
+        s.logger().Debug("Nth root result", "result", result)
+        return result, nil</span>
 }
 
 func (s *Service) inverse(a float64) (float64, error) <span class="cov8" title="1">{
+        s.logger().Debug("Performing inverse", "a", a)
         if a == 0 </span><span class="cov8" title="1">{
+                s.logger().Error("Inverse of zero attempted", "a", a)
                 return 0, errors.New("cannot calculate inverse of zero")
         }</span>
-        <span class="cov8" title="1">return 1 / a, nil</span>
+        <span class="cov8" title="1">result := 1 / a
+        s.logger().Debug("Inverse result", "result", result)
+        return result, nil</span>
 }
 
 func (s *Service) negative(a float64) (float64, error) <span class="cov8" title="1">{
-        return -a, nil
+        s.logger().Debug("Performing negation", "a", a)
+        result := -a
+        s.logger().Debug("Negation result", "result", result)
+        return result, nil
 }</span>
 </pre>
 		
@@ -352,19 +427,48 @@ func (s *Service) negative(a float64) (float64, error) <span class="cov8" title=
 
 import (
         "log"
+        "log/slog"
         "net/http"
+        "os"
 
         "calculator/internal/calculator"
 
+        "github.com/gin-contrib/cors"
         "github.com/gin-gonic/gin"
 )
 
 func main() <span class="cov0" title="0">{
+        // Setup file logging
+        logFile, err := os.OpenFile("calculator.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Failed to open log file: %v", err)
+        }</span>
+        <span class="cov0" title="0">defer func() </span><span class="cov0" title="0">{
+                _ = logFile.Close()
+        }</span>()
+
+        // Create a file-based logger
+        <span class="cov0" title="0">fileLogger := slog.New(slog.NewJSONHandler(logFile, &amp;slog.HandlerOptions{
+                Level: slog.LevelDebug,
+        }))
+
+        // Set the default logger to also write to file (optional - for other packages)
+        slog.SetDefault(fileLogger)
+
         // Create a new Gin router
         r := gin.Default()
 
-        // Create calculator service
-        calculatorService := &amp;calculator.Service{}
+        // Configure CORS middleware
+        config := cors.DefaultConfig()
+        config.AllowOrigins = []string{"http://localhost:3000"}
+        config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+        config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
+        r.Use(cors.New(config))
+
+        // Create calculator service with file logger
+        calculatorService := &amp;calculator.Service{
+                Logger: fileLogger,
+        }
 
         // Setup routes
         setupRoutes(r, calculatorService)
@@ -372,6 +476,7 @@ func main() <span class="cov0" title="0">{
         // Start the server
         port := ":8080"
         log.Printf("Server starting on port %s\n", port)
+        log.Printf("Logging to file: calculator.log\n")
         if err := r.Run(port); err != nil </span><span class="cov0" title="0">{
                 log.Fatalf("Failed to start server: %v", err)
         }</span>

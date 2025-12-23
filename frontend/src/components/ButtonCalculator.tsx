@@ -229,7 +229,7 @@ export const ButtonCalculator: React.FC = () => {
       setWaitingForNewValue(true);
       setJustCalculated(false);
     }
-  }, [currentValue, display, operation, waitingForNewValue, justCalculated]);
+  }, [currentValue, display, operation, waitingForNewValue, justCalculated, addToHistory, previousValue]);
 
   const calculate = useCallback(async () => {
     if (!operation || !previousValue || !currentValue) return;
@@ -281,38 +281,7 @@ export const ButtonCalculator: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [operation, previousValue, currentValue]);
-
-  const calculateUnary = useCallback(async (op: UnaryOperation, value: number) => {
-    setIsLoading(true);
-    try {
-      let response;
-
-      switch (op) {
-        case "inverse":
-          response = await calculatorApi.inverse(value);
-          break;
-        case "negative":
-          response = await calculatorApi.negative(value);
-          break;
-      }
-
-      if (response) {
-        const equation = `${getOperationSymbol(op)}(${value}) = ${response.result}`;
-        setLastEquation(equation);
-        setDisplay(response.result.toString());
-        setCurrentValue(response.result.toString());
-        // Reset state for next calculation but preserve operation
-        setPreviousValue("");
-        setWaitingForNewValue(true);
-        setJustCalculated(true);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Calculation error");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  }, [operation, previousValue, currentValue, addToHistory]);
 
   // Handle keyboard events
   useEffect(() => {
@@ -374,7 +343,7 @@ export const ButtonCalculator: React.FC = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
-  }, [inputNumber, inputDecimal, performOperation, clearAll, clearEntry]);
+  }, [inputNumber, inputDecimal, performOperation, clearAll, clearEntry, calculate]);
 
   return (
     <div className="calculator-container">

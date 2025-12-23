@@ -254,16 +254,50 @@ Each log entry includes structured key-value pairs with:
 
 ## Testing
 
-The service includes comprehensive unit tests. To run tests:
+### Backend (Go)
+
+The server includes comprehensive unit tests with 95%+ coverage. To run tests:
 
 ```bash
 # Run all tests
-go test ./...
+make test
 
 # Run tests with coverage
+make test-coverage
+
+# Or directly with go
+go test ./...
 go test -coverprofile=coverage.out ./...
 go tool cover -html=coverage.out -o coverage.html
 ```
+
+### Frontend (React)
+
+The frontend includes unit tests using Jest and React Testing Library.
+
+```bash
+cd frontend
+
+# Run tests in watch mode
+npm test
+
+# Run tests once with coverage (CI mode)
+npm run test:ci
+
+# Run linter
+npm run lint
+
+# Auto-fix lint issues
+npm run lint:fix
+
+# Format code with Prettier
+npm run format
+```
+
+**Test coverage includes:**
+- Component rendering tests
+- User interaction tests (number input, operations, clear)
+- History panel toggle tests
 
 ## Development
 
