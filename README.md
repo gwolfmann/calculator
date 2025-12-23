@@ -77,6 +77,64 @@ All unary calculator endpoints accept a JSON body with one number `a`:
 - `POST /api/v1/inverse` - Calculate inverse (1/a)
 - `POST /api/v1/negative` - Calculate negative (-a)
 
+### POST cURL Examples
+
+**Binary Operations:**
+```bash
+# Addition
+curl -X POST "http://localhost:8080/api/v1/add" \
+  -H "Content-Type: application/json" \
+  -d '{"a": 10, "b": 5}'
+
+# Subtraction
+curl -X POST "http://localhost:8080/api/v1/subtract" \
+  -H "Content-Type: application/json" \
+  -d '{"a": 10, "b": 5}'
+
+# Multiplication
+curl -X POST "http://localhost:8080/api/v1/multiply" \
+  -H "Content-Type: application/json" \
+  -d '{"a": 10, "b": 5}'
+
+# Division
+curl -X POST "http://localhost:8080/api/v1/divide" \
+  -H "Content-Type: application/json" \
+  -d '{"a": 10, "b": 5}'
+
+# Percentage
+curl -X POST "http://localhost:8080/api/v1/percentage" \
+  -H "Content-Type: application/json" \
+  -d '{"a": 100, "b": 10}'
+
+# Power
+curl -X POST "http://localhost:8080/api/v1/power" \
+  -H "Content-Type: application/json" \
+  -d '{"a": 2, "b": 3}'
+
+# Square Root
+curl -X POST "http://localhost:8080/api/v1/sqrt" \
+  -H "Content-Type: application/json" \
+  -d '{"a": 16, "b": 0}'
+
+# Nth Root
+curl -X POST "http://localhost:8080/api/v1/root" \
+  -H "Content-Type: application/json" \
+  -d '{"a": 27, "b": 3}'
+```
+
+**Unary Operations:**
+```bash
+# Inverse (1/a)
+curl -X POST "http://localhost:8080/api/v1/inverse" \
+  -H "Content-Type: application/json" \
+  -d '{"a": 2}'
+
+# Negative (-a)
+curl -X POST "http://localhost:8080/api/v1/negative" \
+  -H "Content-Type: application/json" \
+  -d '{"a": 5}'
+```
+
 #### GET Endpoints:
 All operations also support GET requests with query parameters:
 
@@ -93,6 +151,49 @@ All operations also support GET requests with query parameters:
 **Unary Operations:**
 - `GET /api/v1/inverse?a=2`
 - `GET /api/v1/negative?a=5`
+
+### cURL Examples
+
+**Binary Operations:**
+```bash
+# Addition
+curl -X GET "http://localhost:8080/api/v1/add?a=10&b=5"
+
+# Subtraction
+curl -X GET "http://localhost:8080/api/v1/subtract?a=10&b=5"
+
+# Multiplication
+curl -X GET "http://localhost:8080/api/v1/multiply?a=10&b=5"
+
+# Division
+curl -X GET "http://localhost:8080/api/v1/divide?a=10&b=5"
+
+# Percentage
+curl -X GET "http://localhost:8080/api/v1/percentage?a=100&b=10"
+
+# Power
+curl -X GET "http://localhost:8080/api/v1/power?a=2&b=3"
+
+# Square Root
+curl -X GET "http://localhost:8080/api/v1/sqrt?a=16&b=0"
+
+# Nth Root
+curl -X GET "http://localhost:8080/api/v1/root?a=27&b=3"
+```
+
+**Unary Operations:**
+```bash
+# Inverse (1/a)
+curl -X GET "http://localhost:8080/api/v1/inverse?a=2"
+
+# Negative (-a)
+curl -X GET "http://localhost:8080/api/v1/negative?a=5"
+```
+
+**Health Check:**
+```bash
+curl -X GET "http://localhost:8080/health"
+```
 
 ## Getting Started
 
