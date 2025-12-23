@@ -5,6 +5,24 @@ A simple calculator built as:
 - A Go + Gin HTTP API (server)
 - A React + TypeScript UI (frontend)
 
+## Design Rationale
+
+### Backend (Go + Gin)
+
+**Architecture Decisions:**
+- **Service pattern**: Calculator logic encapsulated in a `Service` struct for testability and separation of concerns.
+- **Structured logging (`slog`)**: Go 1.21+ standard library logger provides consistent, parseable log output.
+- **RESTful API**: Both POST (JSON body) and GET (query params) endpoints for flexibility.
+- **Input validation**: All operations validate inputs and return meaningful error messages.
+
+### Frontend (React + TypeScript)
+
+**Architecture Decisions:**
+- **Single component state**: Calculator state managed in `ButtonCalculator` component using React hooks.
+- **API service layer**: `calculatorApi.ts` abstracts HTTP calls, making it easy to mock in tests.
+- **Responsive design**: CSS media queries and flexbox for mobile support with slide-in history drawer.
+- **Keyboard support**: Full keyboard navigation for power users.
+
 ## Features
 
 - Addition
