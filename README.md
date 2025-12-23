@@ -154,47 +154,6 @@ All operations also support GET requests with query parameters:
 
 ### cURL Examples
 
-**Binary Operations:**
-```bash
-# Addition
-curl -X GET "http://localhost:8080/api/v1/add?a=10&b=5"
-
-# Subtraction
-curl -X GET "http://localhost:8080/api/v1/subtract?a=10&b=5"
-
-# Multiplication
-curl -X GET "http://localhost:8080/api/v1/multiply?a=10&b=5"
-
-# Division
-curl -X GET "http://localhost:8080/api/v1/divide?a=10&b=5"
-
-# Percentage
-curl -X GET "http://localhost:8080/api/v1/percentage?a=100&b=10"
-
-# Power
-curl -X GET "http://localhost:8080/api/v1/power?a=2&b=3"
-
-# Square Root
-curl -X GET "http://localhost:8080/api/v1/sqrt?a=16&b=0"
-
-# Nth Root
-curl -X GET "http://localhost:8080/api/v1/root?a=27&b=3"
-```
-
-**Unary Operations:**
-```bash
-# Inverse (1/a)
-curl -X GET "http://localhost:8080/api/v1/inverse?a=2"
-
-# Negative (-a)
-curl -X GET "http://localhost:8080/api/v1/negative?a=5"
-```
-
-**Health Check:**
-```bash
-curl -X GET "http://localhost:8080/health"
-```
-
 ## Getting Started
 
 ## Project Structure
@@ -318,42 +277,46 @@ curl -X POST http://localhost:8080/api/v1/negative \
 ```
 
 ### GET Request Examples
+
+**Binary Operations:**
 ```bash
-# Binary operations
-curl "http://localhost:8080/api/v1/add?a=10&b=5"
-# Response: {"result":15}
+# Addition
+curl -X GET "http://localhost:8080/api/v1/add?a=10&b=5"
 
-curl "http://localhost:8080/api/v1/subtract?a=10&b=5"
-# Response: {"result":5}
+# Subtraction
+curl -X GET "http://localhost:8080/api/v1/subtract?a=10&b=5"
 
-curl "http://localhost:8080/api/v1/multiply?a=10&b=5"
-# Response: {"result":50}
+# Multiplication
+curl -X GET "http://localhost:8080/api/v1/multiply?a=10&b=5"
 
-curl "http://localhost:8080/api/v1/divide?a=10&b=5"
-# Response: {"result":2}
+# Division
+curl -X GET "http://localhost:8080/api/v1/divide?a=10&b=5"
 
-curl "http://localhost:8080/api/v1/percentage?a=100&b=10"
-# Response: {"result":10}
+# Percentage
+curl -X GET "http://localhost:8080/api/v1/percentage?a=100&b=10"
 
-curl "http://localhost:8080/api/v1/power?a=2&b=3"
-# Response: {"result":8}
+# Power
+curl -X GET "http://localhost:8080/api/v1/power?a=2&b=3"
 
-curl "http://localhost:8080/api/v1/sqrt?a=16&b=0"
-# Response: {"result":4}
+# Square Root
+curl -X GET "http://localhost:8080/api/v1/sqrt?a=16&b=0"
 
-curl "http://localhost:8080/api/v1/root?a=27&b=3"
-# Response: {"result":3}
+# Nth Root
+curl -X GET "http://localhost:8080/api/v1/root?a=27&b=3"
+```
 
-# Unary operations
-curl "http://localhost:8080/api/v1/inverse?a=4"
-# Response: {"result":0.25}
+**Unary Operations:**
+```bash
+# Inverse (1/a)
+curl -X GET "http://localhost:8080/api/v1/inverse?a=2"
 
-curl "http://localhost:8080/api/v1/negative?a=5"
-# Response: {"result":-5}
+# Negative (-a)
+curl -X GET "http://localhost:8080/api/v1/negative?a=5"
+```
 
-# Health check
-curl "http://localhost:8080/health"
-# Response: {"status":"ok"}
+**Health Check:**
+```bash
+curl -X GET "http://localhost:8080/health"
 ```
 
 ## Logging
