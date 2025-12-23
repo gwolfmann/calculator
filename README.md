@@ -319,15 +319,41 @@ curl -X POST http://localhost:8080/api/v1/negative \
 
 ### GET Request Examples
 ```bash
-# Binary operation
-curl "http://localhost:8080/api/v1/power?a=2&b=3"
+# Binary operations
+curl "http://localhost:8080/api/v1/add?a=10&b=5"
+# Response: {"result":15}
 
+curl "http://localhost:8080/api/v1/subtract?a=10&b=5"
+# Response: {"result":5}
+
+curl "http://localhost:8080/api/v1/multiply?a=10&b=5"
+# Response: {"result":50}
+
+curl "http://localhost:8080/api/v1/divide?a=10&b=5"
+# Response: {"result":2}
+
+curl "http://localhost:8080/api/v1/percentage?a=100&b=10"
+# Response: {"result":10}
+
+curl "http://localhost:8080/api/v1/power?a=2&b=3"
 # Response: {"result":8}
 
-# Unary operation
-curl "http://localhost:8080/api/v1/inverse?a=4"
+curl "http://localhost:8080/api/v1/sqrt?a=16&b=0"
+# Response: {"result":4}
 
+curl "http://localhost:8080/api/v1/root?a=27&b=3"
+# Response: {"result":3}
+
+# Unary operations
+curl "http://localhost:8080/api/v1/inverse?a=4"
 # Response: {"result":0.25}
+
+curl "http://localhost:8080/api/v1/negative?a=5"
+# Response: {"result":-5}
+
+# Health check
+curl "http://localhost:8080/health"
+# Response: {"status":"ok"}
 ```
 
 ## Logging
